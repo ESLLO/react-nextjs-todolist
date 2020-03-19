@@ -1,35 +1,17 @@
-import express from 'express';
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import { ServerStyleSheets, ThemeProvider } from '@material-ui/core/styles';
-import App from './App';
-import theme from './theme';
+// server.js
+const { createServer } = require('http');
+const { parse } = require('url');
+const next = require('next');
 
-function handleRender(req, res) {
-  const sheets = new ServerStyleSheets();
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handle = app.getRequestHandler();
 
-  // Render the component to a string.
-  const html = ReactDOMServer.renderToString(
-    sheets.collect(
-      <ThemeProvider theme={theme}>
-        <App />
-      </ThemeProvider>
-    )
-  );
-
-  // Grab the CSS from the sheets.
-  const css = sheets.toString();
-
-  // Send the rendered page back to the client.
-  res.send(renderFullPage(html, css));
-}
-
-const app = express();
-
-app.use('/build', express.static('build'));
-
-// This is fired every time the server-side receives a request.
-app.use(handleRender);
-
-const port = 3000;
-app.listen(port);
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res, '/');
+  }).listen(3000, err => {
+    if (err) throw err;
+    console.log('> Ready on http://localhost:3000');
+  });
+});
