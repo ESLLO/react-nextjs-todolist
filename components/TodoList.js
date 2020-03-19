@@ -88,7 +88,6 @@ const TodoList = () => {
     <Fragment>
       <List>
         {todoList.map((value, index) => {
-          console.log(value.id + ' ' + value.anim);
           return (
             <ListItem
               key={value.id}
